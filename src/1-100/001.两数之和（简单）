@@ -1,0 +1,110 @@
+
+---
+theme: smartblue
+highlight: a11y-dark
+---
+
+> 关键字： 【数组】、【哈希表】
+
+
+## 题目描述
+这是 `LeetCode` 上的 这是 LeetCode 上的 [1. 两数之和](https://leetcode-cn.com/problems/two-sum/)，难度为 **简单**。
+
+给定一个整数数组 `nums` 和一个整数目标值 `target`，请你在该数组中找出 和为目标值 `target`  的那 `两个` 整数，并返回它们的数组下标。
+
+你可以假设每种输入只会对应一个答案。但是，数组中同一个元素在答案里不能重复出现。
+
+你可以按任意顺序返回答案。
+
+
+示例 1：
+```eg
+输入：nums = [2,7,11,15], target = 9
+输出：[0,1]
+解释：因为 nums[0] + nums[1] == 9 ，返回 [0, 1] 。
+```
+
+示例 2：
+```eg
+输入：nums = [3,2,4], target = 6
+输出：[1,2]
+```
+
+示例 3：
+```eg
+输入：nums = [3,3], target = 6
+输出：[0,1]
+```
+
+提示：
+```eg
+2 <= nums.length <= 104
+-109 <= nums[i] <= 109
+-109 <= target <= 109
+```
+
+**只会存在一个有效答案**
+> 进阶：你可以想出一个时间复杂度小于 O(n2) 的算法吗？
+
+## 划重点
+1. 返回两个数：为`下标`、`不能重复出现`
+2. `任意顺序`返回答案
+3. 一定有答案
+4. 两数相加等于目标值
+
+## 暴力解法
+首先我们能想到的是暴力扫描数据，定义两个指针 `i` 和 `j`，分别扫描数组进行数学计算。
+
+即： `nums[i] + nums[j] == target`
+
+则结果就是 `i` 和 `j`，注意了，题目中提到 `数组中同一个元素在答案里不能重复出现`，就是说遍历的时候不能有重复遍历，所以 `i` 可以完全遍历， `j` 遍历没有遍历 `i` 此时没有扫到的元素
+
+```java
+class Solution {
+    public int[] twoSum(int[] nums, int target) {
+        int len = nums.length;
+        for (int i = 0; i < len; i++) {
+            for (int j = i + 1; j < len; j++) {
+                if (nums[i] + nums[j] == target) {
+                    return new int[]{i, j};
+                }
+            }
+        }
+        // 忽视次数，这里只是保证方法不报错
+        return null;
+    }
+}
+```
+- 时间复杂度：O($n^2$)：两次循环
+- 空间复杂度：O(1)
+
+## 算法优化
+
+当时间复杂度比空间复杂度大很多的时候，我们可以采取 `空间换时间` 的方法。
+
+对上题目中给出的问题，我们不难发现，我们在寻找答案的过程中，对于数组中的任意一个数 `i`，我们是要去寻找在数组中是否有另外一个数字 `j` 满足 `i + j = target`，所以我们进行了两次遍历，但是第二个循环中，我们寻找数字是否存在的操作重复了很多次。 
+
+那么我们可以将第二个数 `target - i` 存储起来，在遍历的时候直接找在我们过去的结果中是否存在就行了，我们可以使用 `哈希表` 将第二个数存储。即 `key` 存储数据，`value` 存储数字对应的下标。
+
+```java
+class Solution {
+    public int[] twoSum(int[] nums, int target) {
+        int len = nums.length;
+        // 定义Hash表
+        HashMap<Integer, Integer> hashMap = new HashMap<>(len);
+        for (int i = 0; i < len; i++) {
+            int value = nums[i];
+            // 计算第二个数
+            int j = target - value;
+            if (hashMap.containsKey(j)) {
+                // 如果能找到，直接返回
+                return new int[]{i, hashMap.get(j)};
+            } else {
+                // 没有找到，将当前数字放入Hash表中
+                hashMap.put(value, i);
+            }
+        }
+        return null;
+    }
+}
+```
